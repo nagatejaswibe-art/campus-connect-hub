@@ -20,8 +20,6 @@ import Leave from "./pages/Leave";
 import Feedback from "./pages/Feedback";
 import TrackStatus from "./pages/TrackStatus";
 import PostNotice from "./pages/PostNotice";
-import FacultyComplaints from "./pages/FacultyComplaints";
-import FacultyRequests from "./pages/FacultyRequests";
 import LeaveApprovals from "./pages/LeaveApprovals";
 import ResolvedIssues from "./pages/ResolvedIssues";
 import FacultyActivity from "./pages/FacultyActivity";

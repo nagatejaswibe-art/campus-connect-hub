@@ -14,16 +14,284 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      complaints: {
+        Row: {
+          category: string
+          created_at: string
+          department: string
+          description: string
+          faculty_reply: string | null
+          forwarded_to_admin: boolean | null
+          id: string
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          department: string
+          description: string
+          faculty_reply?: string | null
+          forwarded_to_admin?: boolean | null
+          id?: string
+          status?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          department?: string
+          description?: string
+          faculty_reply?: string | null
+          forwarded_to_admin?: boolean | null
+          id?: string
+          status?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          created_at: string
+          department: string
+          description: string
+          id: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          description: string
+          id?: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          description?: string
+          id?: string
+          student_id?: string
+        }
+        Relationships: []
+      }
+      leaves: {
+        Row: {
+          created_at: string
+          department: string
+          from_date: string
+          id: string
+          reason: string
+          status: string
+          student_id: string
+          to_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          from_date: string
+          id?: string
+          reason: string
+          status?: string
+          student_id: string
+          to_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          from_date?: string
+          id?: string
+          reason?: string
+          status?: string
+          student_id?: string
+          to_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notices: {
+        Row: {
+          created_at: string
+          created_by: string
+          department: string | null
+          description: string
+          event_date: string | null
+          id: string
+          is_global: boolean | null
+          pinned: boolean | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          department?: string | null
+          description: string
+          event_date?: string | null
+          id?: string
+          is_global?: boolean | null
+          pinned?: boolean | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          department?: string | null
+          description?: string
+          event_date?: string | null
+          id?: string
+          is_global?: boolean | null
+          pinned?: boolean | null
+          title?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          department: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          id: string
+          name?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      requests: {
+        Row: {
+          created_at: string
+          department: string
+          description: string
+          id: string
+          status: string
+          student_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          description: string
+          id?: string
+          status?: string
+          student_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          description?: string
+          id?: string
+          status?: string
+          student_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_notices: {
+        Row: {
+          created_at: string
+          id: string
+          notice_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notice_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notice_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_notices_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "notices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "faculty" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +418,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "faculty", "admin"],
+    },
   },
 } as const

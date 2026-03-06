@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import NotificationBell from '@/components/NotificationBell';
 import {
   Bell, Calendar, FileText, MessageSquare, Send, Clock, Bookmark,
   LogOut, Menu, X, Home, Users, CheckCircle, Forward, Pin, Shield,
@@ -26,6 +27,7 @@ const studentNav: NavItem[] = [
   { label: 'Feedback', href: '/dashboard/feedback', icon: <MessageSquare className="h-5 w-5" /> },
   { label: 'Track Status', href: '/dashboard/track', icon: <BarChart3 className="h-5 w-5" /> },
   { label: 'My Submissions', href: '/dashboard/submissions', icon: <FileText className="h-5 w-5" /> },
+  { label: 'Notifications', href: '/dashboard/notifications', icon: <Bell className="h-5 w-5" /> },
 ];
 
 const facultyNav: NavItem[] = [
@@ -156,10 +158,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
           </button>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center">3</span>
-            </Button>
+            <NotificationBell />
           </div>
         </header>
 

@@ -24,7 +24,8 @@ import LeaveApprovals from "./pages/LeaveApprovals";
 import ResolvedIssues from "./pages/ResolvedIssues";
 import FacultyActivity from "./pages/FacultyActivity";
 import NotFound from "./pages/NotFound";
-
+import Submissions from "./pages/Submissions";
+import Notifications from "./pages/Notifications";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -51,7 +52,8 @@ const App = () => (
             <Route path="/dashboard/leave" element={<ProtectedRoute><Leave /></ProtectedRoute>} />
             <Route path="/dashboard/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
             <Route path="/dashboard/track" element={<ProtectedRoute><TrackStatus /></ProtectedRoute>} />
-            <Route path="/dashboard/submissions" element={<ProtectedRoute><TrackStatus /></ProtectedRoute>} />
+            <Route path="/dashboard/submissions" element={<ProtectedRoute><Submissions /></ProtectedRoute>} />
+            <Route path="/dashboard/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/dashboard/post-notice" element={<ProtectedRoute><PostNotice /></ProtectedRoute>} />
             <Route path="/dashboard/leave-approvals" element={<ProtectedRoute><LeaveApprovals /></ProtectedRoute>} />
             <Route path="/dashboard/resolved" element={<ProtectedRoute><ResolvedIssues /></ProtectedRoute>} />

@@ -9,17 +9,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { MessageSquare, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
+
+const CATEGORIES = [
+  'Food', 'Library', 'Lab Access', 'Transport',
+  'Accounting', 'Class Issues', 'Hostel', 'Infrastructure',
+];
 
 const Complaints = () => {
   const { user } = useAuth();
   const [category, setCategory] = useState('');
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !category || !description.trim()) {
+    if (!user || !category || !title.trim() || !description.trim()) {
       toast.error('Please fill all fields');
       return;
     }
@@ -30,10 +36,12 @@ const Complaints = () => {
         category,
         department: user.department || 'General',
         description: description.trim(),
-      });
+        title: title.trim(),
+      } as any);
       if (error) throw error;
       toast.success('Complaint submitted!');
       setCategory('');
+      setTitle('');
       setDescription('');
     } catch (err: any) {
       toast.error(err.message || 'Failed to submit');
@@ -55,18 +63,21 @@ const Complaints = () => {
               <div className="space-y-2">
                 <Label>Category</Label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="hostel">Hostel</SelectItem>
-                    <SelectItem value="dayscholar">Day Scholar</SelectItem>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c.toLowerCase()}>{c}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
+                <Label>Title</Label>
+                <Input placeholder="Brief title of your complaint" value={title} onChange={(e) => setTitle(e.target.value)} />
+              </div>
+              <div className="space-y-2">
                 <Label>Description</Label>
-                <Textarea placeholder="Describe your complaint..." value={description} onChange={(e) => setDescription(e.target.value)} rows={5} />
+                <Textarea placeholder="Describe your complaint in detail..." value={description} onChange={(e) => setDescription(e.target.value)} rows={5} />
               </div>
               <Button type="submit" disabled={loading}>
                 <Send className="mr-2 h-4 w-4" />

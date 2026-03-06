@@ -4,11 +4,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Send } from 'lucide-react';
+
+const REQUEST_TYPES = ['Bonafide Certificate', 'Document Request', 'Academic Support Request', 'Lab Access', 'Other'];
 
 const Requests = () => {
   const { user } = useAuth();
@@ -18,7 +20,7 @@ const Requests = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !type.trim() || !description.trim()) {
+    if (!user || !type || !description.trim()) {
       toast.error('Please fill all fields');
       return;
     }
@@ -27,7 +29,7 @@ const Requests = () => {
       const { error } = await supabase.from('requests').insert({
         student_id: user.id,
         department: user.department || 'General',
-        type: type.trim(),
+        type,
         description: description.trim(),
       });
       if (error) throw error;
@@ -53,7 +55,14 @@ const Requests = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label>Request Type</Label>
-                <Input placeholder="e.g., Certificate, Lab Access..." value={type} onChange={(e) => setType(e.target.value)} />
+                <Select value={type} onValueChange={setType}>
+                  <SelectTrigger><SelectValue placeholder="Select request type" /></SelectTrigger>
+                  <SelectContent>
+                    {REQUEST_TYPES.map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Description</Label>

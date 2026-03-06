@@ -8,17 +8,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import StatusBadge from '@/components/StatusBadge';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, Forward, MessageSquare } from 'lucide-react';
+import { CheckCircle, Forward, MessageSquare, Filter } from 'lucide-react';
+
+const CATEGORIES = ['all', 'food', 'library', 'lab access', 'transport', 'accounting', 'class issues', 'hostel', 'infrastructure'];
 
 const FacultyComplaints = () => {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState<any[]>([]);
   const [replyText, setReplyText] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [filterCategory, setFilterCategory] = useState('all');
 
-  useEffect(() => {
-    fetchComplaints();
-  }, []);
+  useEffect(() => { fetchComplaints(); }, []);
 
   const fetchComplaints = async () => {
     const { data } = await supabase.from('complaints').select('*').order('created_at', { ascending: false });
@@ -31,37 +32,48 @@ const FacultyComplaints = () => {
     if (reply) update.faculty_reply = reply;
     const { error } = await supabase.from('complaints').update(update).eq('id', id);
     if (error) toast.error('Failed to update');
-    else {
-      toast.success(`Status updated to ${status}`);
-      fetchComplaints();
-    }
+    else { toast.success(`Status updated to ${status}`); fetchComplaints(); setReplyText(prev => ({ ...prev, [id]: '' })); }
   };
 
   const forwardToAdmin = async (id: string) => {
-    const { error } = await supabase.from('complaints').update({ forwarded_to_admin: true }).eq('id', id);
+    const { error } = await supabase.from('complaints').update({ forwarded_to_admin: true, status: 'forwarded' }).eq('id', id);
     if (error) toast.error('Failed to forward');
-    else {
-      toast.success('Forwarded to admin');
-      fetchComplaints();
-    }
+    else { toast.success('Forwarded to admin'); fetchComplaints(); }
   };
+
+  const filtered = filterCategory === 'all'
+    ? complaints
+    : complaints.filter(c => c.category?.toLowerCase() === filterCategory);
 
   return (
     <DashboardLayout>
       <div className="space-y-6 animate-fade-in">
-        <div>
-          <h1 className="text-2xl font-bold font-display">
-            {user?.role === 'admin' ? 'All Complaints' : 'Student Complaints'}
-          </h1>
-          <p className="text-muted-foreground">Review and manage complaints</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold font-display">
+              {user?.role === 'admin' ? 'All Complaints' : 'Student Complaints'}
+            </h1>
+            <p className="text-muted-foreground">Review and manage complaints</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map(c => (
+                  <SelectItem key={c} value={c} className="capitalize">{c === 'all' ? 'All Categories' : c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {loading ? (
           <p className="text-muted-foreground">Loading...</p>
-        ) : complaints.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <Card><CardContent className="p-8 text-center text-muted-foreground">No complaints found.</CardContent></Card>
         ) : (
           <div className="space-y-4">
-            {complaints.map((c) => (
+            {filtered.map((c) => (
               <Card key={c.id}>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between">
@@ -71,7 +83,8 @@ const FacultyComplaints = () => {
                         <span className="text-xs text-muted-foreground">{c.department}</span>
                         {c.forwarded_to_admin && <span className="text-xs bg-warning/10 text-warning px-2 py-0.5 rounded-full">Forwarded</span>}
                       </div>
-                      <p className="font-medium">{c.description}</p>
+                      <h3 className="font-semibold">{(c as any).title || c.category}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{c.description}</p>
                       <p className="text-xs text-muted-foreground mt-1">{new Date(c.created_at).toLocaleDateString()}</p>
                       {c.faculty_reply && (
                         <div className="mt-2 p-2 bg-muted/50 rounded text-sm">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,23 +12,38 @@ const NotificationBell = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [recent, setRecent] = useState<any[]>([]);
 
+  const fetchNotifications = useCallback(async () => {
+    if (!user) return;
+    const { data, count } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact' })
+      .eq('user_id', user.id)
+      .eq('read', false)
+      .order('created_at', { ascending: false })
+      .limit(5);
+    setUnreadCount(count || 0);
+    setRecent(data || []);
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
-    const fetch = async () => {
-      const { data, count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact' })
-        .eq('user_id', user.id)
-        .eq('read', false)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      setUnreadCount(count || 0);
-      setRecent(data || []);
-    };
-    fetch();
-    const interval = setInterval(fetch, 30000);
-    return () => clearInterval(interval);
-  }, [user]);
+    fetchNotifications();
+
+    // Use realtime subscription instead of polling
+    const channel = supabase
+      .channel('notifications-bell')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => {
+        fetchNotifications();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchNotifications]);
 
   return (
     <Popover>

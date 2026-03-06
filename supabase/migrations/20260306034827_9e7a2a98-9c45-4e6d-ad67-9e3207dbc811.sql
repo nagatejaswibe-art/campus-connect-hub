@@ -1,0 +1,1 @@
+ALTER TABLE public.complaints ADD COLUMN IF NOT EXISTS title text DEFAULT '';
